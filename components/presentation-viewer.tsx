@@ -6,9 +6,11 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ChevronLeft, ChevronRight, Download, LogOut } from 'lucide-react'
 import * as pdfjsLib from 'pdfjs-dist'
-import { AnnotationCanvas } from './annotation-canvas'
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
+// Set up PDF.js worker - use local file from public directory
+if (typeof window !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs'
+}
 
 interface Presentation {
   id: number
