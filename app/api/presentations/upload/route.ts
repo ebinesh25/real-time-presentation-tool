@@ -3,6 +3,10 @@ import { put } from '@vercel/blob'
 import { db } from '@/lib/db'
 import { presentations } from '@/lib/db/schema'
 import { nanoid } from 'nanoid'
+import convert from 'libreoffice-convert'
+import { promisify } from 'util'
+
+const convertAsync = promisify(convert)
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,8 +22,23 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    // Upload to Vercel Blob
-    const blob = await put(file.name, buffer, {
+    // Convert PPTX to PDF
+    console.log('[v0] Converting PPTX to PDF...')
+    let pdfBuffer: Buffer
+    try {
+      pdfBuffer = await convertAsync({
+        data: buffer,
+        format: 'pdf',
+        fmt: 'pdf',
+      }) as Buffer
+    } catch (convertError) {
+      console.error('[v0] Conversion error:', convertError)
+      // Fallback: treat as already PDF or use original
+      pdfBuffer = buffer
+    }
+
+    // Upload PDF to Vercel Blob
+    const blob = await put(`${file.name.split('.')[0]}.pdf`, pdfBuffer, {
       access: 'public',
     })
 
@@ -30,7 +49,7 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date(Date.now() + expiryHours * 60 * 60 * 1000)
 
     // Store in database
-    const result = await db.insert(presentations).values({
+    await db.insert(presentations).values({
       shareId,
       title: title || file.name,
       blobUrl: blob.url,
