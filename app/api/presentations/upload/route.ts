@@ -4,10 +4,10 @@ import { db } from '@/lib/db'
 import { presentationOwners, presentations } from '@/lib/db/schema'
 import { createPresenterToken, hashPresenterToken, presenterCookieName } from '@/lib/presenter-auth'
 import { nanoid } from 'nanoid'
-import { convert } from 'libreoffice-convert'
-import { promisify } from 'util'
+import { convertDocument } from '@matbee/libreoffice-converter/server'
+import { join } from 'node:path'
 
-const convertAsync = promisify(convert)
+export const maxDuration = 60
 
 export async function POST(request: NextRequest) {
   const uploadedUrls: string[] = []
@@ -28,7 +28,9 @@ export async function POST(request: NextRequest) {
     console.log('[v0] Converting PPTX to PDF...')
     let pdfBuffer: Buffer
     try {
-      pdfBuffer = await convertAsync(buffer, 'pdf', undefined) as Buffer
+      const wasmPath = join(process.cwd(), 'node_modules', '@matbee', 'libreoffice-converter', 'wasm')
+      const result = await convertDocument(buffer, { outputFormat: 'pdf' }, { wasmPath })
+      pdfBuffer = Buffer.from(result.data)
     } catch (convertError) {
       console.error('[v0] Conversion error:', convertError)
       return NextResponse.json({ message: 'Could not convert the PowerPoint file to PDF.' }, { status: 500 })
