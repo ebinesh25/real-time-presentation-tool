@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getClients, broadcastToClients } from '@/lib/sse'
+import { broadcastToClients } from '@/lib/sse'
+import { isActivePresentationOwner } from '@/lib/presenter-auth'
 
 export async function POST(
   request: NextRequest,
@@ -8,8 +9,10 @@ export async function POST(
   const { shareId } = await params
   
   try {
+    if (!(await isActivePresentationOwner(shareId))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     const body = await request.json()
     const { slideIndex } = body
+    if (!Number.isInteger(slideIndex) || slideIndex < 0) return NextResponse.json({ error: 'Invalid slide' }, { status: 400 })
 
     // Broadcast to all connected clients
     broadcastToClients(shareId, 'slide-change', {

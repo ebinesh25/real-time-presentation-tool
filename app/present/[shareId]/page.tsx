@@ -2,7 +2,8 @@ import { db } from '@/lib/db'
 import { presentations } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 import { PresentationViewer } from '@/components/presentation-viewer'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
+import { isPresentationOwner } from '@/lib/presenter-auth'
 
 export default async function PresentPage({ params }: { params: Promise<{ shareId: string }> }) {
   const { shareId } = await params
@@ -17,6 +18,8 @@ export default async function PresentPage({ params }: { params: Promise<{ shareI
     notFound()
   }
 
+  if (!(await isPresentationOwner(shareId))) redirect(`/join/${encodeURIComponent(shareId)}`)
+
   const pres = presentation[0]
   const isActive = new Date() < pres.expiresAt
 
@@ -25,6 +28,7 @@ export default async function PresentPage({ params }: { params: Promise<{ shareI
       presentation={pres}
       isActive={isActive}
       shareId={shareId}
+      isPresenter
     />
   )
 }

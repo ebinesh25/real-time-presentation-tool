@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "landing-page-guru-skill": {
+      "source": "Pageree/landing-page-guru-skill",
+      "sourceType": "github",
+      "skillPath": "skills/landing-page-guru-skill/SKILL.md",
+      "computedHash": "07bde4c10a85c2e8b73c3fde3a3df2ff654d5ff8fa8730cd18b91888ef87abca"
+    }
+  }
+}

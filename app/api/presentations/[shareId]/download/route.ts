@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { presentations, presenterAnnotations } from '@/lib/db/schema'
+import { presentations, presentationOwners } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
-import { PDFDocument } from 'pdf-lib'
 
 export async function POST(
   request: NextRequest,
@@ -11,13 +10,11 @@ export async function POST(
   const { shareId } = await params
   
   try {
-    const body = await request.json()
-    const { slideIndex, localAnnotations } = body
-
     // Get presentation
     const presentation = await db
-      .select()
+      .select({ title: presentations.title, blobUrl: presentations.blobUrl, originalBlobUrl: presentationOwners.originalBlobUrl, originalFilename: presentationOwners.originalFilename })
       .from(presentations)
+      .leftJoin(presentationOwners, eq(presentationOwners.presentationId, presentations.id))
       .where(eq(presentations.shareId, shareId))
       .limit(1)
 
@@ -25,37 +22,17 @@ export async function POST(
       return NextResponse.json({ error: 'Presentation not found' }, { status: 404 })
     }
 
-    // Get presenter annotations for this slide if exists
-    const presenterAnnots = await db
-      .select()
-      .from(presenterAnnotations)
-      .where(
-        eq(presenterAnnotations.presentationId, presentation[0].id) &&
-        eq(presenterAnnotations.slideIndex, slideIndex)
-      )
-      .limit(1)
-
-    // Create a new PDF with the slide image and annotations
-    const pdfDoc = await PDFDocument.create()
-    const page = pdfDoc.addPage([800, 600])
-
-    // Add slide image
-    if (localAnnotations?.slideImage) {
-      // For data URLs from canvas, convert directly
-      const base64Data = localAnnotations.slideImage.split(',')[1]
-      if (base64Data) {
-        const imageBytes = Buffer.from(base64Data, 'base64')
-        const image = await pdfDoc.embedPng(imageBytes)
-        page.drawImage(image, { x: 0, y: 0, width: 800, height: 600 })
-      }
+    const file = presentation[0]
+    const fileResponse = await fetch(file.originalBlobUrl || file.blobUrl)
+    if (!fileResponse.ok) {
+      throw new Error(`Failed to fetch presentation file (${fileResponse.status})`)
     }
-
-    const pdfBytes = await pdfDoc.save()
-
-    return new NextResponse(pdfBytes, {
+    const fileTitle = file.title.replace(/[^a-z0-9-_]+/gi, '-').replace(/^-|-$/g, '') || 'presentation'
+    const filename = (file.originalFilename || `${fileTitle}.pdf`).replace(/[\r\n"\\/]/g, '_')
+    return new NextResponse(await fileResponse.arrayBuffer(), {
       headers: {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="slide-${slideIndex + 1}.pdf"`,
+        'Content-Type': file.originalBlobUrl ? 'application/octet-stream' : 'application/pdf',
+        'Content-Disposition': `attachment; filename="presentation${file.originalBlobUrl ? (filename.toLowerCase().endsWith('.pptx') ? '.pptx' : '.ppt') : '.pdf'}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
       },
     })
   } catch (error) {

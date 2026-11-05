@@ -152,14 +152,17 @@ export function AnnotationCanvas({
         onMouseMove={draw}
         onMouseUp={endDrawing}
         onMouseLeave={endDrawing}
-        className={`flex-1 ${isPresenter ? 'cursor-crosshair' : 'cursor-default'}`}
+        className={`min-h-0 w-full flex-1 ${isPresenter ? 'cursor-crosshair' : 'cursor-default'}`}
       />
 
       {isPresenter && (
-        <div className="flex gap-2 p-3 bg-muted border-t">
+        <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-t border-[#e9eaf0] bg-white px-3 py-2">
+          <span className="mr-1 hidden text-[10px] font-bold uppercase tracking-wider text-[#a1a6b2] sm:inline">Annotate</span>
           <Button
             size="sm"
             variant={mode === 'draw' ? 'default' : 'outline'}
+            className={mode === 'draw' ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'border-[#e5e7ef] bg-white text-[#626a79] hover:bg-[#f6f7fb]'}
+            aria-pressed={mode === 'draw'}
             onClick={() => setMode('draw')}
           >
             <Pen className="w-4 h-4 mr-1" />
@@ -168,12 +171,14 @@ export function AnnotationCanvas({
           <Button
             size="sm"
             variant={mode === 'erase' ? 'default' : 'outline'}
+            className={mode === 'erase' ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'border-[#e5e7ef] bg-white text-[#626a79] hover:bg-[#f6f7fb]'}
+            aria-pressed={mode === 'erase'}
             onClick={() => setMode('erase')}
           >
             <Eraser className="w-4 h-4 mr-1" />
             Erase
           </Button>
-          <Button size="sm" variant="outline" onClick={clearCanvas}>
+          <Button size="sm" variant="outline" className="border-[#e5e7ef] bg-white text-[#626a79] hover:bg-[#f6f7fb]" onClick={clearCanvas}>
             <RotateCcw className="w-4 h-4 mr-1" />
             Clear
           </Button>

@@ -32,7 +32,9 @@ export async function GET(
   return new NextResponse(customReadable, {
     headers: {
       'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
+      'Cache-Control': 'no-cache, no-transform',
+      'Content-Encoding': 'identity',
+      'X-Accel-Buffering': 'no',
       Connection: 'keep-alive',
     },
   })

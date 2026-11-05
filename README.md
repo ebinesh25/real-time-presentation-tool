@@ -22,6 +22,10 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+Apply the SQL migration in `migrations/0001_presentation_owners.sql` to the configured PostgreSQL database before uploading presentations. LibreOffice must be installed on the server to convert PowerPoint files.
+
+An upload creates a presenter session in the uploader's browser and a separate `/join/<id>` link for viewers. Presenter access is tied to that browser and hostname; clearing its cookies or switching devices loses access. Viewers can download the original PowerPoint for new uploads. Presentations uploaded before this feature only have the converted PDF and cannot be assigned to an uploader automatically.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 ## Learn More

@@ -10,6 +10,13 @@ export const presentations = pgTable('presentations', {
   createdAt: timestamp('created_at', { withTimezone: true }).default(sql`NOW()`),
 })
 
+export const presentationOwners = pgTable('presentation_owners', {
+  presentationId: integer('presentation_id').primaryKey().references(() => presentations.id, { onDelete: 'cascade' }),
+  tokenHash: text('token_hash').notNull(),
+  originalBlobUrl: text('original_blob_url').notNull(),
+  originalFilename: text('original_filename').notNull(),
+})
+
 export const presenterAnnotations = pgTable('presenter_annotations', {
   id: serial('id').primaryKey(),
   presentationId: integer('presentation_id')

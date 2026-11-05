@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { presentations, presenterAnnotations } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { broadcastToClients } from '@/lib/sse'
+import { isPresentationOwner } from '@/lib/presenter-auth'
 
 export async function POST(
   request: NextRequest,
@@ -11,6 +12,7 @@ export async function POST(
   const { shareId } = await params
   
   try {
+    if (!(await isPresentationOwner(shareId))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     const body = await request.json()
     const { slideIndex, annotationData } = body
 
@@ -24,14 +26,15 @@ export async function POST(
     if (!presentation.length) {
       return NextResponse.json({ error: 'Presentation not found' }, { status: 404 })
     }
+    if (presentation[0].expiresAt <= new Date()) return NextResponse.json({ error: 'Presentation expired' }, { status: 403 })
 
     // Check if annotation already exists for this slide
     const existing = await db
       .select()
       .from(presenterAnnotations)
       .where(
-        eq(presenterAnnotations.presentationId, presentation[0].id) &&
-        eq(presenterAnnotations.slideIndex, slideIndex)
+        and(eq(presenterAnnotations.presentationId, presentation[0].id),
+        eq(presenterAnnotations.slideIndex, slideIndex))
       )
       .limit(1)
 
