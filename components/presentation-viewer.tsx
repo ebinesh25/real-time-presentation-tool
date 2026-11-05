@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { AnnotationCanvas } from '@/components/annotation-canvas'
 import { createSlideSync } from '@/lib/slide-sync'
+import QRCode from 'qrcode'
 import {
   ChevronLeft,
   ChevronRight,
@@ -22,6 +23,9 @@ import {
   Keyboard,
   Link2,
   Play,
+  QrCode,
+  Users,
+  X,
 } from 'lucide-react'
 
 interface Presentation {
@@ -55,6 +59,9 @@ export function PresentationViewer({
   const [showShortcuts, setShowShortcuts] = useState(false)
   const [shareUrl, setShareUrl] = useState('')
   const [copyStatus, setCopyStatus] = useState('')
+  const [qrCode, setQrCode] = useState('')
+  const [showQrCode, setShowQrCode] = useState(true)
+  const [viewerCount, setViewerCount] = useState(0)
   const [syncError, setSyncError] = useState('')
   const currentSlideRef = useRef(0)
   const slideSyncRef = useRef<ReturnType<typeof createSlideSync> | null>(null)
@@ -83,6 +90,20 @@ export function PresentationViewer({
   useEffect(() => {
     setShareUrl(`${window.location.origin}/join/${encodeURIComponent(shareId)}`)
   }, [shareId])
+
+  useEffect(() => {
+    if (!shareUrl) return
+    let cancelled = false
+    QRCode.toDataURL(shareUrl, {
+      width: 240,
+      margin: 1,
+      errorCorrectionLevel: 'M',
+      color: { dark: '#17191c', light: '#ffffff' },
+    }).then((dataUrl) => {
+      if (!cancelled) setQrCode(dataUrl)
+    }).catch((error) => console.error('[presentation] QR generation failed:', error))
+    return () => { cancelled = true }
+  }, [shareUrl])
 
   const copyShareLink = async () => {
     try {
@@ -141,7 +162,13 @@ export function PresentationViewer({
   useEffect(() => {
     if (!isActive) return
 
-    const eventSource = new EventSource(`/api/presentations/${shareId}/subscribe`)
+    const eventSource = new EventSource(`/api/presentations/${shareId}/subscribe${isPresenter ? '?role=presenter' : ''}`)
+
+    eventSource.addEventListener('viewer-count', (event) => {
+      if (!isPresenter) return
+      const data = JSON.parse(event.data)
+      if (Number.isInteger(data.viewerCount) && data.viewerCount >= 0) setViewerCount(data.viewerCount)
+    })
 
     eventSource.addEventListener('slide-change', (event) => {
       if (isPresenter) return
@@ -337,6 +364,7 @@ export function PresentationViewer({
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-1.5 text-xs font-semibold tabular-nums text-indigo-700"><Users className="size-3.5" /> {viewerCount} viewing</span>
                 <span className={`hidden items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold sm:inline-flex ${isActive ? 'bg-emerald-50 text-emerald-700' : 'bg-[#f0f1f5] text-[#737988]'}`}><span className={`size-1.5 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-[#9ca3af]'}`} />{isActive ? 'Session active' : 'View only'}</span>
                 <Button variant="ghost" size="icon" aria-label="Keyboard shortcuts" className="size-9 rounded-xl text-[#697080] hover:bg-[#f1f2f8]" onClick={() => setShowShortcuts(true)}><CircleHelp /></Button>
                 <Button onClick={togglePresentationMode} className="h-10 rounded-xl bg-indigo-600 px-4 text-white shadow-sm shadow-indigo-200 hover:bg-indigo-700 sm:px-5"><Play className="size-4 fill-current" /> <span>Present</span></Button>
@@ -420,8 +448,10 @@ export function PresentationViewer({
               <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400">{isPresenter ? 'Presentation mode' : 'Viewer mode'}</span>
               <span className="h-3 w-px bg-white/20" />
               <span className="max-w-40 truncate text-xs font-medium text-white/70">{presentation.title}</span>
+              {isPresenter && <span className="hidden items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium text-white/80 sm:inline-flex"><Users className="size-3.5" /> {viewerCount} viewing</span>}
             </div>
             <div className="pointer-events-auto flex items-center gap-2">
+              {isPresenter && <Button variant="ghost" size="sm" className="rounded-full border border-white/10 bg-white/5 text-white hover:bg-white/15 hover:text-white" onClick={() => setShowQrCode((visible) => !visible)}>{showQrCode ? <X /> : <QrCode />} {showQrCode ? 'Hide QR' : 'Show QR'}</Button>}
               <Button variant="ghost" size="sm" className="rounded-full border border-white/10 bg-white/5 text-white hover:bg-white/15 hover:text-white" onClick={copyShareLink} disabled={!shareUrl}><Copy /> {copyStatus === 'Link copied' ? 'Copied' : 'Copy link'}</Button>
               <Button variant="ghost" size="sm" className="rounded-full border border-white/10 bg-white/5 text-white hover:bg-white/15 hover:text-white" onClick={togglePresentationMode}>
                 {isPresentationMode ? <Minimize2 /> : <Maximize2 />} {isPresentationMode ? 'Exit fullscreen' : 'Fullscreen'}
@@ -445,6 +475,10 @@ export function PresentationViewer({
             <span className="mx-1 h-8 w-px bg-white/10" />
             <Button variant="ghost" size="icon" aria-label="Download presentation" className="rounded-xl text-white hover:bg-white/15 hover:text-white" onClick={handleDownloadPdf} disabled={downloading}><Download /></Button>
           </div>
+          {qrCode && (!isPresenter || showQrCode) && <div className="fixed bottom-24 right-4 z-20 w-32 rounded-2xl bg-white p-2.5 text-center shadow-2xl sm:bottom-8 sm:right-8 sm:w-40 sm:p-3">
+            <img src={qrCode} alt="QR code linking to this presentation" className="mx-auto aspect-square w-full rounded-lg" />
+            <p className="mt-1.5 text-[10px] font-semibold text-[#33394c] sm:text-xs">Scan to follow along</p>
+          </div>}
           <p className="fixed bottom-4 left-6 hidden text-[10px] font-medium uppercase tracking-[0.2em] text-white/20 sm:block">Live synchronization active</p>
         </div>
       )}

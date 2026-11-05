@@ -15,14 +15,14 @@ import {
 } from 'lucide-react'
 
 export const metadata = {
-  title: 'Presentation Share | Present together, from anywhere',
-  description: 'Upload a PowerPoint, share a viewer link, and guide your audience through your slides.',
+  title: 'Presentation Share | I built this so everyone can see the slides',
+  description: 'I made a simple way to share presentation slides live. Upload your PowerPoint, send people the link, and they can follow along on their own screen.',
 }
 
 const steps = [
-  { number: '01', icon: FileUp, title: 'Bring your slides', description: 'Upload your PowerPoint and choose how long your session stays active.' },
-  { number: '02', icon: Link2, title: 'Invite your audience', description: 'Copy a viewer link and share it with the people following along.' },
-  { number: '03', icon: MousePointer2, title: 'Lead the way', description: 'Move through your deck while your audience follows from their own screens.' },
+  { number: '01', icon: FileUp, title: 'Upload your deck', description: 'Pick your PowerPoint and I’ll make a link people can open on their phones or laptops.' },
+  { number: '02', icon: Link2, title: 'Share the link', description: 'Send it to the room. Everyone can follow along from wherever they’re sitting.' },
+  { number: '03', icon: MousePointer2, title: 'Change slides together', description: 'When you move to the next slide, it updates on everyone’s screen too.' },
 ]
 
 function PresentationIllustration() {
@@ -67,24 +67,24 @@ export default function Page() {
 
         <section id="top" className="relative mx-auto grid max-w-[1280px] items-center gap-12 px-5 pb-20 pt-14 sm:px-8 sm:pb-24 sm:pt-20 lg:grid-cols-[1fr_1.04fr] lg:gap-16 lg:px-10 lg:pb-28 lg:pt-24">
           <div className="relative z-10 max-w-[610px]">
-            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-400/25 bg-indigo-400/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[.13em] text-indigo-200"><Sparkles className="size-3.5" /> A better way to follow along</div>
-            <h1 className="mt-6 text-[2.85rem] font-semibold leading-[1.04] tracking-[-0.045em] sm:text-[4.2rem] lg:text-[4.6rem]">Your slides.<br /><span className="text-[#a6a9ff]">Everyone in sync.</span></h1>
-            <p className="mt-6 max-w-[480px] text-base leading-7 text-[#b6bacd] sm:text-lg sm:leading-8">Share your presentation with a link and guide everyone through it, one slide at a time.</p>
-            <div className="mt-8 flex flex-wrap items-center gap-4"><a href="#upload" className="inline-flex h-12 items-center gap-3 rounded-xl bg-indigo-500 px-5 text-sm font-semibold text-white shadow-lg shadow-indigo-950/30 transition-colors hover:bg-indigo-400">Start presenting <ArrowRight className="size-4" /></a><a href="#how-it-works" className="inline-flex h-12 items-center gap-2 px-1 text-sm font-medium text-[#c9ccda] transition-colors hover:text-white">See how it works <ArrowDown className="size-4" /></a></div>
-            <p className="mt-6 flex items-center gap-2 text-xs text-[#8f96ad]"><Check className="size-3.5 text-indigo-300" /> PowerPoint in. A shareable presentation out.</p>
+            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-400/25 bg-indigo-400/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[.13em] text-indigo-200"><Sparkles className="size-3.5" /> A little project from the back row</div>
+            <h1 className="mt-6 text-[2.85rem] font-semibold leading-[1.04] tracking-[-0.045em] sm:text-[4.2rem] lg:text-[4.6rem]">I couldn’t see<br /><span className="text-[#a6a9ff]">the slides either.</span></h1>
+            <p className="mt-6 max-w-[500px] text-base leading-7 text-[#b6bacd] sm:text-lg sm:leading-8">I wear glasses, and from the back of a convention room the shared screen might as well be a postcard. So I built this: upload your PowerPoint, share a link, and everyone can follow along on their own screen as you present.</p>
+            <div className="mt-8 flex flex-wrap items-center gap-4"><a href="#upload" className="inline-flex h-12 items-center gap-3 rounded-xl bg-indigo-500 px-5 text-sm font-semibold text-white shadow-lg shadow-indigo-950/30 transition-colors hover:bg-indigo-400">Give it a try <ArrowRight className="size-4" /></a><a href="#how-it-works" className="inline-flex h-12 items-center gap-2 px-1 text-sm font-medium text-[#c9ccda] transition-colors hover:text-white">How it works <ArrowDown className="size-4" /></a></div>
+            <p className="mt-6 flex items-center gap-2 text-xs text-[#8f96ad]"><Check className="size-3.5 text-indigo-300" /> If you’ve ever squinted at a screen from the back row, this is for you.</p>
           </div>
           <PresentationIllustration />
         </section>
       </div>
 
       <section id="how-it-works" className="mx-auto max-w-[1280px] px-5 py-20 sm:px-8 sm:py-24 lg:px-10">
-        <div className="grid gap-5 md:grid-cols-[1fr_1fr] md:items-end"><div><p className="text-xs font-bold uppercase tracking-[.16em] text-indigo-600">Simple by design</p><h2 className="mt-3 max-w-md text-3xl font-semibold leading-tight tracking-[-0.035em] text-[#202436] sm:text-4xl">From your screen to theirs.</h2></div><p className="max-w-md text-sm leading-7 text-[#7c8293] md:ml-auto">Keep everyone on the same page, whether you’re walking through an idea, a lesson, or your next project.</p></div>
+        <div className="grid gap-5 md:grid-cols-[1fr_1fr] md:items-end"><div><p className="text-xs font-bold uppercase tracking-[.16em] text-indigo-600">How I use it</p><h2 className="mt-3 max-w-md text-3xl font-semibold leading-tight tracking-[-0.035em] text-[#202436] sm:text-4xl">A better view from any seat.</h2></div><p className="max-w-md text-sm leading-7 text-[#7c8293] md:ml-auto">I made this for the person at the back trying to read the tiny screen. If that’s you too, give it a go at your next talk, class, or meetup.</p></div>
         <div className="mt-10 grid gap-4 md:grid-cols-3">{steps.map(({ number, icon: Icon, title, description }) => <article key={number} className="rounded-2xl border border-[#eceef4] bg-[#fafbfe] p-6 sm:p-7"><div className="flex items-center justify-between"><span className="flex size-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600"><Icon className="size-5" /></span><span className="font-mono text-xs font-semibold text-[#c3c7d2]">{number}</span></div><h3 className="mt-7 text-lg font-semibold tracking-tight">{title}</h3><p className="mt-2 max-w-xs text-sm leading-6 text-[#818797]">{description}</p></article>)}</div>
       </section>
 
       <section id="upload" className="scroll-mt-6 border-y border-[#eaecf3] bg-[#f7f8fc]">
         <div className="mx-auto grid max-w-[1280px] items-start gap-10 px-5 py-20 sm:px-8 lg:grid-cols-[1fr_1fr] lg:gap-20 lg:px-10 lg:py-24">
-          <div className="max-w-[480px]"><p className="text-xs font-bold uppercase tracking-[.16em] text-indigo-600">Get started</p><h2 className="mt-3 text-3xl font-semibold leading-tight tracking-[-0.035em] sm:text-4xl">Your next presentation starts here.</h2><p className="mt-4 text-sm leading-7 text-[#7d8494] sm:text-base">Choose a PowerPoint file, set your session duration, and create your presenter workspace.</p><div className="mt-8 space-y-4 border-t border-[#e7e9f1] pt-7"><p className="flex items-start gap-3 text-sm text-[#606879]"><Link2 className="mt-0.5 size-4 shrink-0 text-indigo-500" /> A separate link for your audience to join</p><p className="flex items-start gap-3 text-sm text-[#606879]"><Download className="mt-0.5 size-4 shrink-0 text-indigo-500" /> Viewers can download your original presentation</p><p className="flex items-start gap-3 text-sm text-[#606879]"><Clock3 className="mt-0.5 size-4 shrink-0 text-indigo-500" /> Choose when live updates stop</p></div></div>
+          <div className="max-w-[480px]"><p className="text-xs font-bold uppercase tracking-[.16em] text-indigo-600">Made for the back row</p><h2 className="mt-3 text-3xl font-semibold leading-tight tracking-[-0.035em] sm:text-4xl">Have the same problem? Try it out.</h2><p className="mt-4 text-sm leading-7 text-[#7d8494] sm:text-base">Upload a PowerPoint, choose how long the session stays open, then share the viewer link with your audience. They can follow the slides live and download the original deck too.</p><div className="mt-8 space-y-4 border-t border-[#e7e9f1] pt-7"><p className="flex items-start gap-3 text-sm text-[#606879]"><Link2 className="mt-0.5 size-4 shrink-0 text-indigo-500" /> Everyone gets their own link to follow along</p><p className="flex items-start gap-3 text-sm text-[#606879]"><Download className="mt-0.5 size-4 shrink-0 text-indigo-500" /> Viewers can download the PowerPoint</p><p className="flex items-start gap-3 text-sm text-[#606879]"><Clock3 className="mt-0.5 size-4 shrink-0 text-indigo-500" /> Pick how long live updates stay on</p></div></div>
           <UploadForm />
         </div>
       </section>
